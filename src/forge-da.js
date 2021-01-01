@@ -656,6 +656,7 @@ program
     .option('-s, --short', 'Output app bundle ID instead of the entire JSON.')
     .option('-u, --update', 'If activity already exists, update it.')
     .option('-d, --description <description>', 'Optional activity description.')
+    .option('-n, --nickname <nickname>', 'Optional assigned nickname to the app.')
     .option('--script', 'Optional engine-specific script to pass to activity.')
     .option('-i, --input <name>', 'Activity input ID (can be used multiple times).', _collectActivityInputs)
     .option('-iv, --input-verb <verb>', 'Optional HTTP verb for the last activity input ("get" by default; can be used multiple times).', _collectActivityInputProps('verb'))
@@ -688,6 +689,11 @@ program
                 description = `${activityShortId} created via Forge CLI Utils.`;
             }
 
+            let appId = command.nickname;
+            if (!appId) {
+                appId = FORGE_CLIENT_ID;
+            }
+
             let exists = false;
             if (command.update) {
                 exists = await activityExists(activityShortId);
@@ -697,20 +703,20 @@ program
             const engineId = DesignAutomationID.parse(engineFullId);
             switch (engineId.id) {
                 case 'AutoCAD':
-                    config = _autocadActivityConfig(activityShortId, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script);
+                    config = _autocadActivityConfig(activityShortId, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script);
                     break;
                 case '3dsMax':
-                    config = _3dsmaxActivityConfig(activityShortId, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script)
+                    config = _3dsmaxActivityConfig(activityShortId, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script)
                     break;
                 case 'Revit':
-                    config = _revitActivityConfig(activityShortId, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
+                    config = _revitActivityConfig(activityShortId, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
                     break;
                 case 'Inventor':
-                    config = _inventorActivityConfig(activityShortId, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
+                    config = _inventorActivityConfig(activityShortId, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
                     break;
             }
 
-            const bundleFullId = new DesignAutomationID(FORGE_CLIENT_ID, bundleShortId, bundleAlias).toString();
+            const bundleFullId = new DesignAutomationID(appId, bundleShortId, bundleAlias).toString();
             let activity = exists
                 ? await designAutomation.updateActivity(activityShortId, engineFullId, config.commandLine, bundleFullId, config.parameters, config.settings, description)
                 : await designAutomation.createActivity(activityShortId, engineFullId, config.commandLine, bundleFullId, config.parameters, config.settings, description);
@@ -732,6 +738,7 @@ program
     .option('-c, --create', 'If activity does not exist, create it.')
     .option('-d, --description <description>', 'Optional activity description.')
     .option('--script', 'Optional engine-specific script to pass to activity.')
+    .option('-n, --nickname <nickname>', 'Optional assigned nickname to the app.')
     .option('-i, --input <name>', 'Activity input ID (can be used multiple times).', _collectActivityInputs)
     .option('-iv, --input-verb <verb>', 'Optional HTTP verb for the last activity input ("get" by default; can be used multiple times).', _collectActivityInputProps('verb'))
     .option('-iz, --input-zip <boolean>', 'Optional zip flag for the last activity input (can be used multiple times).', _collectActivityInputProps('zip', (val) => val.toLowerCase() === 'true'))
@@ -761,6 +768,11 @@ program
             if (!description) {
                 description = `${activityShortId} created via Forge CLI Utils.`;
             }
+
+            let appId = command.nickname;
+            if (!appId) {
+                appId = FORGE_CLIENT_ID;
+            }
     
             let exists = true;
             if (command.create) {
@@ -771,16 +783,16 @@ program
             const engineId = DesignAutomationID.parse(engineFullId);
             switch (engineId.id) {
                 case 'AutoCAD':
-                    config = _autocadActivityConfig(id, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script);
+                    config = _autocadActivityConfig(id, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script);
                     break;
                 case '3dsMax':
-                    config = _3dsmaxActivityConfig(id, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script)
+                    config = _3dsmaxActivityConfig(id, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs, command.script)
                     break;
                 case 'Revit':
-                    config = _revitActivityConfig(id, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
+                    config = _revitActivityConfig(id, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
                     break;
                 case 'Inventor':
-                    config = _inventorActivityConfig(id, description, FORGE_CLIENT_ID, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
+                    config = _inventorActivityConfig(id, description, appId, bundleShortId, bundleAlias, engineFullId, _activityInputs, _activityOutputs);
                     break;
             }
 
